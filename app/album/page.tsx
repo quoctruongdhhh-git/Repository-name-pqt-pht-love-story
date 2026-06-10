@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { getAllEntries, updateEntry, type DiaryEntry } from '@/lib/diary-storage';
+import { loveMemories } from '@/lib/love-memories';
 
 const BACK = '\u2190';
 const CLOSE = '\u00d7';
@@ -37,7 +38,7 @@ export default function AlbumPage() {
   }, []);
 
   const visibleEntries = useMemo(() => {
-    return [...entries].sort((a, b) => getEntryTimestamp(a) - getEntryTimestamp(b));
+    return [...getFixedEntries(), ...entries].sort((a, b) => getEntryTimestamp(a) - getEntryTimestamp(b));
   }, [entries]);
 
   const handleEntryUpdated = (updatedEntry: DiaryEntry) => {
@@ -318,7 +319,7 @@ function MemoryDetail({
                   {isSaving ? '\u0110ang l\u01b0u...' : SAVE}
                 </button>
               </>
-            ) : (
+            ) : isFixedEntry(entry) ? null : (
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
@@ -619,6 +620,34 @@ function getEntryTimestamp(entry: DiaryEntry) {
 
   const timestamp = new Date(entry.date).getTime();
   return Number.isNaN(timestamp) ? entry.createdAt : timestamp;
+}
+
+function getFixedEntries(): DiaryEntry[] {
+  return loveMemories.map((memory) => ({
+    id: `fixed-${memory.id}`,
+    title: memory.title,
+    content: memory.desc,
+    date: memory.date,
+    time: '',
+    location: '',
+    images: [memory.image],
+    createdAt: getDateTimestamp(memory.date),
+  }));
+}
+
+function isFixedEntry(entry: DiaryEntry) {
+  return entry.id.startsWith('fixed-');
+}
+
+function getDateTimestamp(date: string) {
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+    const [day, month, year] = date.split('/');
+    const timestamp = new Date(`${year}-${month}-${day}T00:00`).getTime();
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  }
+
+  const timestamp = new Date(date).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
 function readImageFile(file: File): Promise<string> {
