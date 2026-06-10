@@ -34,6 +34,23 @@ export function MusicWidget() {
   const [volume, setVolume] = useState(0.72);
   const [isSaving, setIsSaving] = useState(false);
 
+  useEffect(() => {
+    audioRef.current = getSharedAudio();
+
+    const audio = audioRef.current;
+    const handlePause = () => setIsPlaying(false);
+    const handlePlay = () => setIsPlaying(true);
+
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('play', handlePlay);
+    setIsPlaying(!audio.paused);
+
+    return () => {
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('play', handlePlay);
+    };
+  }, []);
+
   const tryStartMusic = async () => {
     if (!audioRef.current || !trackRef.current) return false;
 
@@ -74,6 +91,14 @@ export function MusicWidget() {
     trackRef.current = track;
 
     if (track) {
+      const audio = getSharedAudio();
+      audioRef.current = audio;
+
+      if (audio.src !== new URL(track.src, window.location.href).href) {
+        audio.src = track.src;
+        audio.currentTime = getStoredMusicTime(track.src);
+      }
+
       void tryStartMusic();
 
       if (hasUserInteractedRef.current) {
@@ -156,25 +181,16 @@ export function MusicWidget() {
     }
 
     audioRef.current?.pause();
+    if (audioRef.current) {
+      audioRef.current.removeAttribute('src');
+      audioRef.current.load();
+    }
     setTrack(null);
     setIsPlaying(false);
   };
 
   return (
     <>
-      {track && (
-        <audio
-          ref={audioRef}
-          src={track.src}
-          loop
-          autoPlay
-          preload="auto"
-          onEnded={() => setIsPlaying(false)}
-          onPause={() => setIsPlaying(false)}
-          onPlay={() => setIsPlaying(true)}
-        />
-      )}
-
       <div className="fixed bottom-24 right-4 z-[80] sm:bottom-6">
         {isOpen ? (
           <div className="w-[min(calc(100vw-2rem),360px)] rounded-[28px] border border-white/70 bg-white/88 p-4 text-[#4a1d29] shadow-[0_22px_70px_rgba(136,19,55,0.24)] backdrop-blur-xl">
@@ -275,6 +291,38 @@ export function MusicWidget() {
       </div>
     </>
   );
+}
+
+declare global {
+  interface Window {
+    __pqtPhtBackgroundAudio?: HTMLAudioElement;
+  }
+}
+
+function getSharedAudio() {
+  if (window.__pqtPhtBackgroundAudio) return window.__pqtPhtBackgroundAudio;
+
+  const audio = new Audio();
+  audio.loop = true;
+  audio.preload = 'auto';
+  audio.addEventListener('timeupdate', () => {
+    if (audio.currentSrc) {
+      sessionStorage.setItem(getMusicTimeKey(audio.currentSrc), String(audio.currentTime));
+    }
+  });
+
+  window.__pqtPhtBackgroundAudio = audio;
+  return audio;
+}
+
+function getStoredMusicTime(src: string) {
+  const storedValue = sessionStorage.getItem(getMusicTimeKey(new URL(src, window.location.href).href));
+  const storedTime = Number(storedValue);
+  return Number.isFinite(storedTime) ? storedTime : 0;
+}
+
+function getMusicTimeKey(src: string) {
+  return `pqt-pht-music-time:${src}`;
 }
 
 async function getPublicMusicTrack(): Promise<ActiveMusicTrack | null> {
