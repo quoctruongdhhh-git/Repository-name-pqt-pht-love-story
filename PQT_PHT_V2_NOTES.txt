@@ -1,0 +1,6 @@
+Version 2.0 changes:
+- Added relationship day counter (start date 13/11/2021)
+- Added romantic hero section
+- Added quick cards for Album and Memories
+- Updated branding to PQT ✦ PHT
+Place your hero image in public/hero-logo.png if desired.
