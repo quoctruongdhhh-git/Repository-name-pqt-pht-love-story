@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const HEART = '\u2665';
 const BACK = '\u2190';
-const LETTER_TITLE = 'L\u1eddi Anh mu\u1ed1n gi\u00e0nh cho em';
-const LETTER_STORAGE_KEY = 'pqt-pht-love-letter';
-const PLACEHOLDER =
-  'Anh mu\u1ed1n vi\u1ebft cho em...\n\nNh\u1eefng \u0111i\u1ec1u anh ch\u01b0a k\u1ecbp n\u00f3i,\nnh\u1eefng c\u1ea3m x\u00fac anh mu\u1ed1n gi\u1eef l\u1ea1i,\nv\u00e0 t\u1ea5t c\u1ea3 y\u00eau th\u01b0\u01a1ng d\u00e0nh cho em.';
+const LETTER_TITLE = 'L\u1eddi Anh mu\u1ed1n d\u00e0nh cho em';
+const LETTER_CONTENT = `A c\u00e1m \u01a1n Em \u0111\u00e3 \u0111\u1ecdc \u0111\u1ebfn \u0111\u00e2y. Nh\u1eefng k\u00fd \u1ee9c, k\u1ef7 ni\u1ec7m c\u00f9ng nhau Anh lu\u00f4n tr\u00e2n tr\u1ecdng. Ng\u01b0\u1eddi con g\u00e1i \u0111\u00e3 l\u00e0m Anh c\u00f3 nh\u1eefng \u01b0\u1edbc m\u01a1 r\u00f5 r\u00e0ng v\u1ec1 t\u01b0\u01a1ng lai. D\u00f9 cho ch\u00fang ta s\u1ebd l\u00e0 g\u00ec \u0111\u1ed1i v\u1edbi nhau trong t\u01b0\u01a1ng lai. Anh tin r\u1eb1ng ch\u00fang ta lu\u00f4n mong mu\u1ed1n nh\u1eefng \u0111i\u1ec1u t\u1ed1t nh\u1ea5t \u0111\u1ebfn v\u1edbi nhau.
+
+Trang \u00e0, ch\u00fang ta quen bi\u1ebft v\u00e0 y\u00eau th\u01b0\u01a1ng nhau nhanh v\u00e0 m\u1ea1nh m\u1ebd nh\u01b0 m\u1ed9t d\u00f2ng su\u1ed1i ch\u1ea3y cu\u1ed3n cu\u1ed9n \u0111\u01b0a l\u00e0n n\u01b0\u1edbc m\u00e1t l\u1ea1nh \u0111\u1ebfn t\u1eebng th\u1eeda ru\u1ed9ng xanh m\u00e1t n\u1eb1m b\u00ean c\u1ea1nh nh\u1eefng b\u1ea3n l\u00e0ng. Anh v\u1eabn c\u00f3 m\u1ed9t ni\u1ec1m tin r\u1eb1ng d\u00f2ng su\u1ed1i \u1ea5y v\u1eabn s\u1ebd ch\u1ea3y, s\u1ebd ti\u1ebfp t\u1ee5c nu\u00f4i d\u01b0\u1ee1ng nh\u1eefng m\u1ea3nh \u0111\u1ea5t m\u00e0 n\u00f3 \u0111i qua. C\u00e1m \u01a1n Em \u0111\u00e3 \u0111\u1ebfn b\u00ean Anh v\u00e0o l\u00fac Anh \u1ed1m \u0111au, ho\u1ea1n n\u1ea1n. C\u1ea7u ch\u00fac cho Em c\u00f3 m\u1ed9t cu\u1ed9c \u0111\u1eddi r\u1ef1c r\u1ee1 theo \u00fd mu\u1ed1n c\u1ee7a Em. Anh lu\u00f4n d\u00f5i theo v\u00e0 \u1ee7ng h\u1ed9 Em. H\u01a1n c\u1ea3 y\u00eau \u0111\u00f3 l\u00e0 th\u01b0\u01a1ng.
+
+Anh th\u01b0\u01a1ng Em!!`;
 
 const heartSeeds = [
   { left: '8%', delay: '0s', duration: '10s', size: 'text-lg', drift: '32px' },
@@ -38,17 +39,6 @@ const fallingHearts = heartSeeds.flatMap((heart, seedIndex) =>
 );
 
 export default function LetterPage() {
-  const [letter, setLetter] = useState('');
-
-  useEffect(() => {
-    setLetter(localStorage.getItem(LETTER_STORAGE_KEY) || '');
-  }, []);
-
-  const handleLetterChange = (value: string) => {
-    setLetter(value);
-    localStorage.setItem(LETTER_STORAGE_KEY, value);
-  };
-
   return (
     <main className="relative min-h-[100svh] overflow-hidden bg-[#251015] text-white">
       <img
@@ -80,20 +70,23 @@ export default function LetterPage() {
               </div>
 
               <div className="mt-7 rounded-[36px] border border-white/18 bg-gradient-to-br from-white/10 via-[#3b1420]/18 to-[#1d0a0f]/12 p-3 shadow-[0_20px_62px_rgba(24,5,9,0.28),0_0_34px_rgba(255,190,202,0.13)] backdrop-blur-[2px] sm:p-4">
-                <textarea
-                  value={letter}
-                  onChange={(event) => handleLetterChange(event.target.value)}
-                  placeholder={PLACEHOLDER}
-                  className="min-h-[34svh] w-full resize-none rounded-[30px] border-0 bg-[#230b11]/14 px-4 py-4 text-center text-[1.06rem] italic leading-[1.9] text-[#fff6ef] outline-none placeholder:text-[#ffe0da]/72 sm:min-h-[360px] sm:px-7 sm:py-6 sm:text-[1.28rem] lg:text-left"
+                <div
+                  className="min-h-[34svh] w-full rounded-[30px] border-0 bg-[#230b11]/14 px-4 py-4 text-center text-[1.06rem] italic leading-[1.9] text-[#fff6ef] outline-none sm:min-h-[360px] sm:px-7 sm:py-6 sm:text-[1.28rem] lg:text-left"
                   style={{ fontFamily: '"Times New Roman", Georgia, serif' }}
-                />
+                >
+                  {LETTER_CONTENT.split('\n\n').map((paragraph) => (
+                    <p key={paragraph} className="mb-5 last:mb-0">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
 
               <p
                 className="mx-auto mt-5 max-w-xl text-center text-sm italic leading-7 text-[#ffd8d3]/90 drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)] sm:text-base lg:mx-0 lg:text-left"
                 style={{ fontFamily: '"Times New Roman", Georgia, serif' }}
               >
-                {HEART} {'Nh\u1eefng d\u00f2ng ch\u1eef n\u00e0y s\u1ebd \u0111\u01b0\u1ee3c gi\u1eef l\u1ea1i tr\u00ean m\u00e1y c\u1ee7a m\u00ecnh.'} {HEART}
+                {HEART} {'Nh\u1eefng d\u00f2ng ch\u1eef n\u00e0y s\u1ebd lu\u00f4n \u1edf \u0111\u00e2y, nh\u01b0 m\u1ed9t l\u1eddi th\u01b0\u01a1ng Anh g\u1eedi \u0111\u1ebfn Em.'} {HEART}
               </p>
 
               <div className="mx-auto mt-6 grid max-w-xl gap-3 sm:grid-cols-2 lg:mx-0">
