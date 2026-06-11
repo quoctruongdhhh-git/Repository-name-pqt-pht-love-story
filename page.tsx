@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { getAllEntries, updateEntry, type DiaryEntry } from '@/lib/diary-storage';
-import { loveMemories } from '@/lib/love-memories';
+import { albumMemories } from '@/lib/album-memories';
 
 const BACK = '\u2190';
 const CLOSE = '\u00d7';
@@ -182,9 +182,11 @@ function MemoryCard({ entry, onOpen }: { entry: DiaryEntry; onOpen: () => void }
         <h2 className="line-clamp-2 text-lg font-black leading-snug text-[#5a2530] sm:text-xl">
           {title}
         </h2>
-        <div className="mt-2 inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-500">
-          {formatDate(entry.date)}
-        </div>
+        {entry.date && (
+          <div className="mt-2 inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-500">
+            {formatDate(entry.date)}
+          </div>
+        )}
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
           {entry.content || 'M\u1ed9t k\u1ef7 ni\u1ec7m nh\u1ecf \u0111ang \u0111\u01b0\u1ee3c l\u01b0u l\u1ea1i trong c\u00e2u chuy\u1ec7n c\u1ee7a ch\u00fang ta.'}
         </p>
@@ -420,11 +422,13 @@ function MemoryDetail({
               />
             ) : (
               <>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-black text-rose-500">
-                  <span>{HEART}</span>
-                  <span>{formatDate(entry.date)}</span>
-                  {entry.time && <span>{entry.time}</span>}
-                </div>
+                {(entry.date || entry.time) && (
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-xs font-black text-rose-500">
+                    <span>{HEART}</span>
+                    {entry.date && <span>{formatDate(entry.date)}</span>}
+                    {entry.time && <span>{entry.time}</span>}
+                  </div>
+                )}
 
                 <h2
                   className="text-3xl font-black leading-tight text-rose-800 sm:text-4xl"
@@ -623,15 +627,15 @@ function getEntryTimestamp(entry: DiaryEntry) {
 }
 
 function getFixedEntries(): DiaryEntry[] {
-  return loveMemories.map((memory) => ({
-    id: `fixed-${memory.id}`,
-    title: memory.title,
-    content: memory.desc,
-    date: memory.date,
+  return albumMemories.map((memory, index) => ({
+    id: `fixed-album-${memory.id}`,
+    title: memory.caption,
+    content: memory.note,
+    date: '',
     time: '',
     location: '',
     images: [memory.image],
-    createdAt: getDateTimestamp(memory.date),
+    createdAt: index,
   }));
 }
 
